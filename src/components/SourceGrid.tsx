@@ -1,17 +1,19 @@
 import { Flex } from "@radix-ui/themes";
-import { Source } from "../interfaces";
+import { Source, Status } from "../interfaces";
 import SourceRow from "./SourceRow";
 
 interface SourceGridProps {
   sources: Source[];
   selectedSourceIndex: number | null;
-  setSelectedSourceIndex: (index: number) => void;
+  handleGridClick: (index: number) => void;
+  updateStatus: (index: number) => (status: Status) => void;
 }
 
 export default function sources({
   sources,
   selectedSourceIndex,
-  setSelectedSourceIndex,
+  handleGridClick,
+  updateStatus,
 }: SourceGridProps) {
   return (
     <Flex gap="4" direction="column" align="center">
@@ -20,7 +22,8 @@ export default function sources({
           key={source.id}
           source={source}
           isSelected={selectedSourceIndex === index}
-          onClick={() => setSelectedSourceIndex(index)}
+          onClick={() => handleGridClick(index)}
+          updateStatus={updateStatus(index)}
         />
       ))}
     </Flex>

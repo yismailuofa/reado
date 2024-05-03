@@ -1,5 +1,5 @@
 .source-row {
-  transition: scale 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  transition: box-shadow 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   cursor: pointer;
 }
 
@@ -8,7 +8,7 @@ button:not([data-disabled="true"]) {
 }
 
 .source-row:hover {
-  scale: 1.005;
+  box-shadow: var(--shadow-1);
 }
 
 .card-selected {
@@ -25,4 +25,8 @@ button:not([data-disabled="true"]) {
 
 body {
   margin: 0;
+}
+
+.rt-Badge {
+  user-select: none;
 }

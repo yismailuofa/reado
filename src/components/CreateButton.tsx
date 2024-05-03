@@ -95,7 +95,7 @@ export default function CreateButton({
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger>
-        <Button variant="surface">
+        <Button>
           Create Source
           <PlusIcon />
         </Button>

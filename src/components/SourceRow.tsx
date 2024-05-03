@@ -5,6 +5,7 @@ import {
   Box,
   Card,
   Flex,
+  Select,
   Text,
   Tooltip,
 } from "@radix-ui/themes";
@@ -14,6 +15,7 @@ interface SourceRowProps {
   source: Source;
   onClick: () => void;
   isSelected: boolean;
+  updateStatus: (status: Status) => void;
 }
 
 function sourceTypeToIcon(type: SourceType) {
@@ -52,13 +54,14 @@ export default function SourceRow({
   source,
   onClick,
   isSelected,
+  updateStatus,
 }: SourceRowProps) {
   return (
-    <Box width="500px" className="source-row">
+    <Box width="500px">
       <Card
         size="1"
         onClick={onClick}
-        className={isSelected ? "card-selected" : ""}
+        className={"source-row" + (isSelected ? " card-selected" : "")}
       >
         <Flex gap="3" align="center">
           <Avatar
@@ -68,22 +71,37 @@ export default function SourceRow({
             variant="solid"
           />
           <Box>
-            <Tooltip content={source.title}>
+            <Tooltip content={source.title} delayDuration={900}>
               <Text as="div" size="2" weight="bold" className="line-overflow">
                 {source.title}
               </Text>
             </Tooltip>
-            <Tooltip content={source.authors}>
+            <Tooltip content={source.authors} delayDuration={900}>
               <Text as="div" size="2" color="gray" className="line-overflow">
                 {source.authors}
               </Text>
             </Tooltip>
           </Box>
-          <Flex ml="auto" direction="column" gap="1" align="end">
+          <Flex ml="auto" direction="column" gap="2" align="end">
             <Badge variant="solid">{source.type}</Badge>
-            <Badge color={statusToBadgeColor(source.status)}>
-              {source.status}
-            </Badge>
+            <Select.Root
+              value={source.status}
+              onValueChange={updateStatus}
+              size="2"
+            >
+              <Select.Trigger variant="ghost" color="gray">
+                <Badge color={statusToBadgeColor(source.status)}>
+                  {source.status}
+                </Badge>
+              </Select.Trigger>
+              <Select.Content>
+                {Object.values(Status).map((type) => (
+                  <Select.Item key={type} value={type}>
+                    {type}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
           </Flex>
         </Flex>
       </Card>
