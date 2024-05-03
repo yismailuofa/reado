@@ -8,7 +8,7 @@ import {
   Text,
   Tooltip,
 } from "@radix-ui/themes";
-import { Source, SourceType } from "../interfaces";
+import { Source, SourceType, Status } from "../interfaces";
 
 interface SourceRowProps {
   source: Source;
@@ -32,6 +32,19 @@ function sourceTypeToIcon(type: SourceType) {
       return <Link2Icon height={iconSize} width={iconSize} />;
     default:
       return <Link2Icon height={iconSize} width={iconSize} />;
+  }
+}
+
+export function statusToBadgeColor(status: Status) {
+  switch (status) {
+    case Status.NotStarted:
+      return "gray";
+    case Status.InProgress:
+      return "blue";
+    case Status.Completed:
+      return "green";
+    default:
+      return "gray";
   }
 }
 
@@ -66,9 +79,12 @@ export default function SourceRow({
               </Text>
             </Tooltip>
           </Box>
-          <Box ml="auto">
-            <Badge>{source.type}</Badge>
-          </Box>
+          <Flex ml="auto" direction="column" gap="1" align="end">
+            <Badge variant="solid">{source.type}</Badge>
+            <Badge color={statusToBadgeColor(source.status)}>
+              {source.status}
+            </Badge>
+          </Flex>
         </Flex>
       </Card>
     </Box>

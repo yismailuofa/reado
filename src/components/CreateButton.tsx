@@ -1,5 +1,6 @@
 import { PlusIcon } from "@radix-ui/react-icons";
 import {
+  Box,
   Button,
   Dialog,
   Flex,
@@ -7,8 +8,9 @@ import {
   Text,
   TextField,
 } from "@radix-ui/themes";
+import { DateTime, Duration } from "luxon";
 import { useCallback, useState } from "react";
-import { Source, SourceType } from "../interfaces";
+import { Source, SourceType, Status } from "../interfaces";
 
 interface TextRowProps extends SourceProps {
   label: string;
@@ -29,34 +31,36 @@ function TextRow({ label, source, setSource, srcKey }: TextRowProps) {
       <TextField.Root
         placeholder={label}
         style={{ width: "80%" }}
-        value={source[srcKey]}
+        value={source[srcKey] as string}
         onChange={(e) => setSource({ ...source, [srcKey]: e.target.value })}
       />
     </Flex>
   );
 }
 
-function TypeRow({ source, setSource }: SourceProps) {
+export function TypeSelectRow({ source, setSource }: SourceProps) {
   return (
     <Flex direction="row" gap="3" align="center">
       <Text weight="bold" size="1" style={{ width: "20%" }}>
         TYPE
       </Text>
-      <Select.Root
-        value={source.type}
-        onValueChange={(value) =>
-          setSource({ ...source, type: value as SourceType })
-        }
-      >
-        <Select.Trigger />
-        <Select.Content>
-          {Object.values(SourceType).map((type) => (
-            <Select.Item key={type} value={type}>
-              {type}
-            </Select.Item>
-          ))}
-        </Select.Content>
-      </Select.Root>
+      <Box ml="-2px">
+        <Select.Root
+          value={source.type}
+          onValueChange={(value) =>
+            setSource({ ...source, type: value as SourceType })
+          }
+        >
+          <Select.Trigger />
+          <Select.Content>
+            {Object.values(SourceType).map((type) => (
+              <Select.Item key={type} value={type}>
+                {type}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Root>
+      </Box>
     </Flex>
   );
 }
@@ -71,8 +75,11 @@ export default function CreateButton({
     title: "",
     authors: "",
     url: "",
-    timeRead: 0,
+    timeRead: Duration.fromObject({}),
     type: SourceType.Article,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+    status: Status.NotStarted,
   };
   const [source, setSource] = useState<Source>(defaultSource);
   const [open, setOpen] = useState(false);
@@ -114,7 +121,7 @@ export default function CreateButton({
             setSource={setSource}
             srcKey="authors"
           />
-          <TypeRow source={source} setSource={setSource} />
+          <TypeSelectRow source={source} setSource={setSource} />
         </Flex>
         <Flex gap="3" mt="4" justify="end">
           <Dialog.Close>

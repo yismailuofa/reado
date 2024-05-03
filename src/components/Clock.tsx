@@ -1,28 +1,49 @@
-import { Button, Flex, Text } from "@radix-ui/themes";
+import { PauseIcon, PlayIcon } from "@radix-ui/react-icons";
+import { Button, Flex, IconButton, Text } from "@radix-ui/themes";
+import { Duration } from "luxon";
 import { useEffect, useState } from "react";
 
-export default function Clock() {
-  const [time, setTime] = useState(
-    new Date().toLocaleTimeString().slice(0, -3)
-  );
+interface ClockProps {
+  onTick: () => void;
+}
+
+export default function Clock({ onTick }: ClockProps) {
+  const [time, setTime] = useState(Duration.fromObject({}));
+  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setTime(new Date().toLocaleTimeString().slice(0, -3));
+      if (isRunning) {
+        setTime((prevTime) => prevTime.plus({ seconds: 1 }));
+        onTick();
+      }
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [isRunning, onTick]);
 
   return (
     <Flex align="center" gap="3" direction="column">
-      <Text size="6" weight="light">
-        {time}
+      <Text size="8" weight="light">
+        {time.toFormat("hh:mm:ss")}
       </Text>
       <Flex gap="1">
-        <Button size="1">Start</Button>
-        <Button size="1" variant="outline">
-          Stop
+        <IconButton
+          size="2"
+          onClick={() => {
+            setIsRunning(!isRunning);
+          }}
+        >
+          {isRunning ? <PauseIcon /> : <PlayIcon />}
+        </IconButton>
+        <Button
+          size="2"
+          onClick={() => {
+            setTime(Duration.fromObject({}));
+          }}
+          variant="outline"
+        >
+          Reset
         </Button>
       </Flex>
     </Flex>
