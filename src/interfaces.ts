@@ -1,9 +1,9 @@
 export enum SourceType {
-  Article = "article",
-  Video = "video",
-  Podcast = "podcast",
-  Book = "book",
-  Course = "course",
+  Article = "Article",
+  Video = "Video",
+  Podcast = "Podcast",
+  Book = "Book",
+  Course = "Course",
 }
 
 export interface Source {
