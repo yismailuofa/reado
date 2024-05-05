@@ -35,11 +35,11 @@ export function mapDBSourceToSource(dbSource: DBSource): Source {
 }
 
 export function sourceComparator(a: Source, b: Source): number {
-  // we sort by status first, then by updatedAt
+  // we sort by status first, then by createdAt
   // InProgress > NotStarted > Completed order
 
   if (a.status === b.status) {
-    return a.updatedAt.toMillis() - b.updatedAt.toMillis();
+    return b.createdAt.toMillis() - a.createdAt.toMillis();
   }
 
   const statusOrder = {
