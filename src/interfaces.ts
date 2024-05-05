@@ -23,3 +23,10 @@ export interface Source {
   type: SourceType;
   status: Status;
 }
+
+export interface AggrStats {
+  totalTimeRead: Duration;
+  numCompleted: number;
+  numInProgress: number;
+  numNotStarted: number;
+}

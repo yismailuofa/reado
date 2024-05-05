@@ -92,7 +92,7 @@ export default function SourceDetail({
             direction="column"
           >
             <Text color="indigo" size="5" style={{ height: "20%" }}>
-              Time Elapsed
+              Time Read
             </Text>
             <Tooltip content={source.timeRead.toHuman()} delayDuration={1200}>
               <Flex
@@ -100,7 +100,7 @@ export default function SourceDetail({
                   borderRadius: "50%",
                   height: "80%",
                   aspectRatio: "1",
-                  border: "3px solid var(--indigo-11)",
+                  border: "2.5px solid var(--indigo-11)",
                 }}
                 m="0"
                 justify="center"

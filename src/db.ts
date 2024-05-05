@@ -50,3 +50,33 @@ export function sourceComparator(a: Source, b: Source): number {
 
   return statusOrder[a.status] - statusOrder[b.status];
 }
+
+export function getStats(sources: Source[]) {
+  let totalTimeRead = Duration.fromObject({ seconds: 0 });
+  let numCompleted = 0;
+  let numInProgress = 0;
+  let numNotStarted = 0;
+
+  for (const source of sources) {
+    totalTimeRead = totalTimeRead.plus(source.timeRead);
+
+    switch (source.status) {
+      case Status.Completed:
+        numCompleted++;
+        break;
+      case Status.InProgress:
+        numInProgress++;
+        break;
+      case Status.NotStarted:
+        numNotStarted++;
+        break;
+    }
+  }
+
+  return {
+    totalTimeRead,
+    numCompleted,
+    numInProgress,
+    numNotStarted,
+  };
+}

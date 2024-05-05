@@ -1,8 +1,15 @@
-import { Box, Container, Flex, Heading, Separator } from "@radix-ui/themes";
+import {
+  Badge,
+  Box,
+  Container,
+  Flex,
+  Heading,
+  Separator,
+} from "@radix-ui/themes";
 import { useLiveQuery } from "dexie-react-hooks";
 import { DateTime, Duration } from "luxon";
 import { useMemo, useState } from "react";
-import { db, mapDBSourceToSource, sourceComparator } from "../db";
+import { db, getStats, mapDBSourceToSource, sourceComparator } from "../db";
 import { Status } from "../interfaces";
 import { useClock } from "./Clock";
 import CreateButton from "./CreateButton";
@@ -28,15 +35,34 @@ export default function App() {
     });
   });
 
+  const stats = useMemo(() => getStats(sources), [sources]);
+
   return (
     <Container size="3" pt="4">
-      <Box p="4">
+      <Flex align="end" pb="4" mx="2">
         <CreateButton
           addSource={(source) => {
             db.sources.add(source);
           }}
         />
-      </Box>
+        <Flex gap="3" ml="auto">
+          <Badge color="orange" size="2">
+            Total Time Read: {stats.totalTimeRead.toHuman()}
+          </Badge>
+          <Badge color="cyan" size="2">
+            Sources: {sources.length}
+          </Badge>
+          <Badge color="gray" size="2">
+            Not Started: {stats.numNotStarted}
+          </Badge>
+          <Badge color="blue" size="2">
+            In Progress: {stats.numInProgress}
+          </Badge>
+          <Badge color="green" size="2">
+            Completed: {stats.numCompleted}
+          </Badge>
+        </Flex>
+      </Flex>
       <Flex justify="center">
         <Separator style={{ width: "100%" }} mb="2" />
       </Flex>
