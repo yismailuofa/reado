@@ -30,3 +30,7 @@ body {
 .rt-Badge {
   user-select: none;
 }
+
+#file-input {
+  display: none;
+}

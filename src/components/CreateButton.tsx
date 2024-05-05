@@ -1,9 +1,10 @@
-import { PlusIcon } from "@radix-ui/react-icons";
+import { Cross2Icon, PlusIcon, UploadIcon } from "@radix-ui/react-icons";
 import {
   Box,
   Button,
   Dialog,
   Flex,
+  IconButton,
   Select,
   Text,
   TextField,
@@ -39,7 +40,49 @@ function TextRow({ label, source, setSource, srcKey }: TextRowProps) {
   );
 }
 
-export function TypeSelectRow({ source, setSource }: SourceProps) {
+function UrlOrFileRow({ source, setSource }: SourceProps) {
+  const hasFile = source.file !== null;
+
+  return (
+    <Flex direction="row" gap="3" align="center">
+      <Text weight="bold" size="1" style={{ width: "20%" }}>
+        URL
+      </Text>
+      <TextField.Root
+        placeholder="URL"
+        style={{ width: hasFile ? "69%" : "50%" }}
+        value={hasFile ? source.file!.name : source.url}
+        onChange={(e) => setSource({ ...source, url: e.target.value })}
+        disabled={hasFile}
+      />
+      <input
+        type="file"
+        id="file-input"
+        accept=".pdf"
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            setSource({ ...source, file: e.target.files[0], url: "" });
+          }
+        }}
+      />
+      {hasFile ? (
+        <IconButton onClick={() => setSource({ ...source, file: null })}>
+          <Cross2Icon />
+        </IconButton>
+      ) : (
+        <Button
+          style={{ width: "25%" }}
+          onClick={() => document.getElementById("file-input")?.click()}
+        >
+          Upload
+          <UploadIcon />
+        </Button>
+      )}
+    </Flex>
+  );
+}
+
+function TypeSelectRow({ source, setSource }: SourceProps) {
   return (
     <Flex direction="row" gap="3" align="center">
       <Text weight="bold" size="1" style={{ width: "20%" }}>
@@ -80,12 +123,15 @@ export default function CreateButton({
     createdAt: DateTime.now().toJSDate(),
     updatedAt: DateTime.now().toJSDate(),
     status: Status.NotStarted,
+    file: null,
   };
   const [source, setSource] = useState<DBSource>(defaultSource);
   const [open, setOpen] = useState(false);
 
   const handleCreate = useCallback(() => {
-    if (!source.title || !source.authors || !source.url) return;
+    if (!source.title || !source.authors || (!source.url && !source.file)) {
+      return;
+    }
 
     addSource(source);
     setSource(defaultSource);
@@ -109,12 +155,8 @@ export default function CreateButton({
             setSource={setSource}
             srcKey="title"
           />
-          <TextRow
-            label="URL"
-            source={source}
-            setSource={setSource}
-            srcKey="url"
-          />
+
+          <UrlOrFileRow source={source} setSource={setSource} />
           <TextRow
             label="Authors"
             source={source}

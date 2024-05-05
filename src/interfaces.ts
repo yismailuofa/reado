@@ -19,6 +19,7 @@ export interface Source {
   title: string;
   authors: string;
   url: string;
+  file: File | null;
   timeRead: Duration;
   type: SourceType;
   status: Status;

@@ -120,7 +120,7 @@ export default function SourceDetail({
         <Flex justify="between" mt="auto">
           <Button asChild>
             <a
-              href={source.url}
+              href={source.file ? URL.createObjectURL(source.file) : source.url}
               target="_blank"
               rel="noreferrer"
               onClick={() => clock.setIsRunning(true)}
