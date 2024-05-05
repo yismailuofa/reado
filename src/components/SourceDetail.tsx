@@ -6,6 +6,7 @@ import {
   IconButton,
   Separator,
   Text,
+  Tooltip,
 } from "@radix-ui/themes";
 import { Duration } from "luxon";
 import { Source } from "../interfaces";
@@ -91,27 +92,29 @@ export default function SourceDetail({
             direction="column"
           >
             <Text color="indigo" size="5" style={{ height: "20%" }}>
-              Time Read
+              Time Elapsed
             </Text>
-            <Flex
-              style={{
-                borderRadius: "50%",
-                height: "80%",
-                aspectRatio: "1",
-                border: "3px solid var(--indigo-11)",
-              }}
-              m="0"
-              justify="center"
-            >
-              <Flex direction="column" align="center" justify="center">
-                <Text size="8" align="center" weight="bold" color="indigo">
-                  {timeReadNum}
-                </Text>
-                <Text size="4" align="center" weight="medium" color="indigo">
-                  {timeReadUnit}
-                </Text>
+            <Tooltip content={source.timeRead.toHuman()} delayDuration={1200}>
+              <Flex
+                style={{
+                  borderRadius: "50%",
+                  height: "80%",
+                  aspectRatio: "1",
+                  border: "3px solid var(--indigo-11)",
+                }}
+                m="0"
+                justify="center"
+              >
+                <Flex direction="column" align="center" justify="center">
+                  <Text size="8" align="center" weight="bold" color="indigo">
+                    {timeReadNum}
+                  </Text>
+                  <Text size="4" align="center" weight="medium" color="indigo">
+                    {timeReadUnit}
+                  </Text>
+                </Flex>
               </Flex>
-            </Flex>
+            </Tooltip>
           </Flex>
         </Flex>
         <Flex justify="between" mt="auto">

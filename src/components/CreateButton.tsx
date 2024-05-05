@@ -10,16 +10,17 @@ import {
 } from "@radix-ui/themes";
 import { DateTime, Duration } from "luxon";
 import { useCallback, useState } from "react";
-import { Source, SourceType, Status } from "../interfaces";
+import { DBSource } from "../db";
+import { SourceType, Status } from "../interfaces";
 
 interface TextRowProps extends SourceProps {
   label: string;
-  srcKey: keyof Source;
+  srcKey: keyof DBSource;
 }
 
 interface SourceProps {
-  source: Source;
-  setSource: (source: Source) => void;
+  source: DBSource;
+  setSource: (source: DBSource) => void;
 }
 
 function TextRow({ label, source, setSource, srcKey }: TextRowProps) {
@@ -68,20 +69,19 @@ export function TypeSelectRow({ source, setSource }: SourceProps) {
 export default function CreateButton({
   addSource,
 }: {
-  addSource: (source: Source) => void;
+  addSource: (source: DBSource) => void;
 }) {
-  const defaultSource: Source = {
-    id: "",
+  const defaultSource: DBSource = {
     title: "",
     authors: "",
     url: "",
-    timeRead: Duration.fromObject({}),
+    timeRead: Duration.fromObject({}).toObject(),
     type: SourceType.Article,
-    createdAt: DateTime.now(),
-    updatedAt: DateTime.now(),
+    createdAt: DateTime.now().toJSDate(),
+    updatedAt: DateTime.now().toJSDate(),
     status: Status.NotStarted,
   };
-  const [source, setSource] = useState<Source>(defaultSource);
+  const [source, setSource] = useState<DBSource>(defaultSource);
   const [open, setOpen] = useState(false);
 
   const handleCreate = useCallback(() => {

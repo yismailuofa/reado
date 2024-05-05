@@ -1,78 +1,41 @@
 import { Box, Container, Flex, Heading, Separator } from "@radix-ui/themes";
+import { useLiveQuery } from "dexie-react-hooks";
 import { DateTime, Duration } from "luxon";
-import { useCallback, useState } from "react";
-import { Source, SourceType, Status } from "../interfaces";
+import { useMemo, useState } from "react";
+import { db, mapDBSourceToSource } from "../db";
+import { Status } from "../interfaces";
 import { useClock } from "./Clock";
 import CreateButton from "./CreateButton";
 import SourceDetail from "./SourceDetail";
 import SourceGrid from "./SourceGrid";
 
 export default function App() {
-  const [sources, setSources] = useState<Source[]>([
-    {
-      id: "1",
-      timeRead: Duration.fromObject({ hours: 3, minutes: 300, seconds: 20 }),
-      title: "Designing Data-Intensive Applications",
-      type: SourceType.Book,
-      url: "https://www.amazon.com/Designing-Data-Intensive-Applications-Reliable-Maintainable/dp/1449373321",
-      authors: "Martin Kleppmann",
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      status: Status.NotStarted,
-    },
-    {
-      id: "2",
-      timeRead: Duration.fromObject({ seconds: 30 }),
-      title: "Coding Adventures",
-      type: SourceType.Video,
-      url: "https://www.youtube.com/playlist?list=PLFt_AvWsXl0ehjAfLFsp1PGaatzAwo0uK",
-      authors: "Sebastian Lague",
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      status: Status.InProgress,
-    },
-    {
-      id: "3",
-      timeRead: Duration.fromObject({ hours: 1 }),
-      title: "Foo Bar",
-      type: SourceType.Video,
-      url: "https://www.youtube.com/playlist?list=PLFt_AvWsXl0ehjAfLFsp1PGaatzAwo0uK",
-      authors: "Sebastian Lague",
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      status: Status.Completed,
-    },
-  ]);
-  const [selectedSourceIndex, setSelectedSourceIndex] = useState<number | null>(
-    null
+  const sources = (useLiveQuery(() => db.sources.toArray(), []) || []).map(
+    mapDBSourceToSource
+  );
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const selectedSource = useMemo(
+    () => (selectedIndex !== null ? sources[selectedIndex] : null),
+    [selectedIndex, sources]
   );
 
-  const onTick = useCallback(() => {
-    if (selectedSourceIndex === null) return;
-    const newSources = [...sources];
-    newSources[selectedSourceIndex].timeRead = newSources[
-      selectedSourceIndex
-    ].timeRead.plus({ seconds: 1 });
-    setSources(newSources);
-  }, [selectedSourceIndex, sources]);
+  const clock = useClock(() => {
+    if (!selectedSource) return;
 
-  const clock = useClock(onTick);
-
-  const handleGridClick = useCallback(
-    (index: number) => {
-      setSelectedSourceIndex(index);
-      if (selectedSourceIndex !== index) {
-        clock.resetClock();
-      }
-    },
-    [clock, selectedSourceIndex]
-  );
+    db.sources.where({ id: selectedSource.id }).modify((source) => {
+      const timeRead = Duration.fromObject(source.timeRead);
+      source.timeRead = timeRead.plus({ seconds: 1 }).rescale().toObject();
+      source.updatedAt = DateTime.now().toJSDate();
+    });
+  });
 
   return (
     <Container size="3" pt="4">
       <Box p="4">
         <CreateButton
-          addSource={(source: Source) => setSources([...sources, source])}
+          addSource={(source) => {
+            db.sources.add(source);
+          }}
         />
       </Box>
       <Flex justify="center">
@@ -86,12 +49,18 @@ export default function App() {
           <Box pt="4" style={{ overflowY: "auto", height: "510px" }}>
             <SourceGrid
               sources={sources}
-              selectedSourceIndex={selectedSourceIndex}
-              handleGridClick={handleGridClick}
-              updateStatus={(index: number) => (status: Status) => {
-                const newSources = [...sources];
-                newSources[index].status = status;
-                setSources(newSources);
+              selectedSource={selectedSource}
+              handleGridClick={(index: number) => {
+                if (selectedIndex !== index) {
+                  clock.resetClock();
+                }
+                setSelectedIndex(index);
+              }}
+              updateStatus={(id: number) => (status: Status) => {
+                db.sources.update(id, {
+                  status,
+                  updatedAt: DateTime.now().toJSDate(),
+                });
               }}
             />
           </Box>
@@ -102,18 +71,13 @@ export default function App() {
           </Heading>
           <Box pt="4" style={{ overflowY: "auto", height: "510px" }}>
             <SourceDetail
-              source={
-                selectedSourceIndex !== null
-                  ? sources[selectedSourceIndex]
-                  : null
-              }
+              source={selectedSource}
               clock={clock}
               onRemove={() => {
-                if (selectedSourceIndex === null) return;
-                const newSources = [...sources];
-                newSources.splice(selectedSourceIndex, 1);
-                setSources(newSources);
-                setSelectedSourceIndex(null);
+                if (selectedSource) {
+                  db.sources.delete(selectedSource.id);
+                  setSelectedIndex(null);
+                }
               }}
             />
           </Box>

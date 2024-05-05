@@ -15,7 +15,7 @@ export enum Status {
 }
 
 export interface Source {
-  id: string;
+  id: number;
   createdAt: DateTime;
   updatedAt: DateTime;
   title: string;
