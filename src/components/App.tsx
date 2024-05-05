@@ -2,7 +2,7 @@ import { Box, Container, Flex, Heading, Separator } from "@radix-ui/themes";
 import { useLiveQuery } from "dexie-react-hooks";
 import { DateTime, Duration } from "luxon";
 import { useMemo, useState } from "react";
-import { db, mapDBSourceToSource } from "../db";
+import { db, mapDBSourceToSource, sourceComparator } from "../db";
 import { Status } from "../interfaces";
 import { useClock } from "./Clock";
 import CreateButton from "./CreateButton";
@@ -10,15 +10,14 @@ import SourceDetail from "./SourceDetail";
 import SourceGrid from "./SourceGrid";
 
 export default function App() {
-  const sources = (useLiveQuery(() => db.sources.toArray(), []) || []).map(
-    mapDBSourceToSource
-  );
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const sources = (useLiveQuery(() => db.sources.toArray(), []) || [])
+    .map(mapDBSourceToSource)
+    .sort(sourceComparator);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const selectedSource = useMemo(
-    () => (selectedIndex !== null ? sources[selectedIndex] : null),
-    [selectedIndex, sources]
+    () => sources.find((source) => source.id === selectedId) || null,
+    [selectedId, sources]
   );
-
   const clock = useClock(() => {
     if (!selectedSource) return;
 
@@ -49,12 +48,12 @@ export default function App() {
           <Box pt="4" style={{ overflowY: "auto", height: "510px" }}>
             <SourceGrid
               sources={sources}
-              selectedSource={selectedSource}
-              handleGridClick={(index: number) => {
-                if (selectedIndex !== index) {
+              selectedId={selectedId}
+              handleGridClick={(id: number) => {
+                if (selectedId !== id) {
                   clock.resetClock();
                 }
-                setSelectedIndex(index);
+                setSelectedId(id);
               }}
               updateStatus={(id: number) => (status: Status) => {
                 db.sources.update(id, {
@@ -76,7 +75,7 @@ export default function App() {
               onRemove={() => {
                 if (selectedSource) {
                   db.sources.delete(selectedSource.id);
-                  setSelectedIndex(null);
+                  setSelectedId(null);
                 }
               }}
             />

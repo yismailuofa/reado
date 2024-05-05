@@ -3,14 +3,14 @@ import { Button, Flex, IconButton, Text } from "@radix-ui/themes";
 import { Duration } from "luxon";
 import { useEffect, useState } from "react";
 
-export interface UseClockProps {
+export interface UseClockResult {
   time: Duration<true>;
   isRunning: boolean;
   setIsRunning: React.Dispatch<React.SetStateAction<boolean>>;
   resetClock: () => void;
 }
 
-export const useClock = (onTick: () => void): UseClockProps => {
+export const useClock = (onTick: () => void): UseClockResult => {
   const [time, setTime] = useState(Duration.fromObject({}));
   const [isRunning, setIsRunning] = useState(false);
 

@@ -1,4 +1,9 @@
-import { Link2Icon, VideoIcon } from "@radix-ui/react-icons";
+import {
+  GlobeIcon,
+  Link2Icon,
+  ReaderIcon,
+  VideoIcon,
+} from "@radix-ui/react-icons";
 import {
   Avatar,
   Badge,
@@ -23,15 +28,11 @@ function sourceTypeToIcon(type: SourceType) {
 
   switch (type) {
     case SourceType.Book:
-      return <Link2Icon height={iconSize} width={iconSize} />;
+      return <ReaderIcon height={iconSize} width={iconSize} />;
     case SourceType.Article:
-      return <Link2Icon height={iconSize} width={iconSize} />;
+      return <GlobeIcon height={iconSize} width={iconSize} />;
     case SourceType.Video:
       return <VideoIcon height={iconSize} width={iconSize} />;
-    case SourceType.Podcast:
-      return <Link2Icon height={iconSize} width={iconSize} />;
-    case SourceType.Course:
-      return <Link2Icon height={iconSize} width={iconSize} />;
     default:
       return <Link2Icon height={iconSize} width={iconSize} />;
   }

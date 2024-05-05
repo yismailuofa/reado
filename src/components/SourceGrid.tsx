@@ -5,26 +5,26 @@ import SourceRow from "./SourceRow";
 
 interface SourceGridProps {
   sources: Source[];
-  selectedSource: Source | null;
+  selectedId: number | null;
   handleGridClick: (id: number) => void;
   updateStatus: (id: number) => (status: Status) => void;
 }
 
 export default function sources({
   sources,
-  selectedSource,
+  selectedId,
   handleGridClick,
   updateStatus,
 }: SourceGridProps) {
   return (
     <Flex gap="4" direction="column" align="center">
       {sources.length ? (
-        sources.map((source, index) => (
+        sources.map((source) => (
           <SourceRow
             key={source.id}
             source={source}
-            isSelected={selectedSource?.id === source.id}
-            onClick={() => handleGridClick(index)}
+            isSelected={selectedId === source.id}
+            onClick={() => handleGridClick(source.id)}
             updateStatus={updateStatus(source.id)}
           />
         ))

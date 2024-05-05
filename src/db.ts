@@ -1,7 +1,7 @@
 // db.ts
 import Dexie, { Table } from "dexie";
 import { DateTime, Duration } from "luxon";
-import { Source } from "./interfaces";
+import { Source, Status } from "./interfaces";
 
 export interface DBSource
   extends Omit<Source, "id" | "createdAt" | "updatedAt" | "timeRead"> {
@@ -32,4 +32,21 @@ export function mapDBSourceToSource(dbSource: DBSource): Source {
     updatedAt: DateTime.fromJSDate(dbSource.updatedAt),
     timeRead: Duration.fromObject(dbSource.timeRead),
   };
+}
+
+export function sourceComparator(a: Source, b: Source): number {
+  // we sort by status first, then by updatedAt
+  // InProgress > NotStarted > Completed order
+
+  if (a.status === b.status) {
+    return a.updatedAt.toMillis() - b.updatedAt.toMillis();
+  }
+
+  const statusOrder = {
+    [Status.InProgress]: 0,
+    [Status.NotStarted]: 1,
+    [Status.Completed]: 2,
+  };
+
+  return statusOrder[a.status] - statusOrder[b.status];
 }

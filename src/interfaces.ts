@@ -3,9 +3,7 @@ import { DateTime, Duration } from "luxon";
 export enum SourceType {
   Article = "Article",
   Video = "Video",
-  Podcast = "Podcast",
   Book = "Book",
-  Course = "Course",
 }
 
 export enum Status {

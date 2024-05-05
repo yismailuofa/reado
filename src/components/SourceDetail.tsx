@@ -10,7 +10,7 @@ import {
 } from "@radix-ui/themes";
 import { Duration } from "luxon";
 import { Source } from "../interfaces";
-import Clock, { UseClockProps } from "./Clock";
+import Clock, { UseClockResult } from "./Clock";
 
 function humanizeDuration(duration: Duration): [number, string] {
   let num = 0;
@@ -33,7 +33,7 @@ function humanizeDuration(duration: Duration): [number, string] {
 interface SourceDetailProps {
   source: Source | null;
   onRemove: () => void;
-  clock: UseClockProps;
+  clock: UseClockResult;
 }
 
 export default function SourceDetail({
