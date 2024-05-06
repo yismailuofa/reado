@@ -11,10 +11,6 @@ button:not([data-disabled="true"]) {
   box-shadow: var(--shadow-1);
 }
 
-.card-selected {
-  --card-background-color: var(--accent-surface);
-}
-
 .line-overflow {
   overflow: hidden;
   text-overflow: ellipsis;

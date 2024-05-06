@@ -19,7 +19,10 @@ export interface Source {
   title: string;
   authors: string;
   url: string;
-  file: File | null;
+  file: {
+    f: File;
+    page: number;
+  } | null;
   timeRead: Duration;
   type: SourceType;
   status: Status;

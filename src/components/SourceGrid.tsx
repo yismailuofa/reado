@@ -1,42 +1,46 @@
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { Callout, Flex } from "@radix-ui/themes";
-import { Source, Status } from "../interfaces";
+import { useState } from "react";
+import {
+  dbSourceToSource,
+  sourcesSelector,
+} from "../features/sources/sourcesSlice";
+import { Source } from "../interfaces";
+import { useAppSelector } from "../store";
 import SourceRow from "./SourceRow";
+import SourceViewer from "./SourceViewer";
 
-interface SourceGridProps {
-  sources: Source[];
-  selectedId: number | null;
-  handleGridClick: (id: number) => void;
-  updateStatus: (id: number) => (status: Status) => void;
-}
+export default function SourceGrid() {
+  const sources = useAppSelector(sourcesSelector).map(dbSourceToSource);
+  const [selectedSource, setSelectedSource] = useState<Source | null>(null);
 
-export default function sources({
-  sources,
-  selectedId,
-  handleGridClick,
-  updateStatus,
-}: SourceGridProps) {
+  if (!sources.length) {
+    return (
+      <Callout.Root variant="outline">
+        <Callout.Icon>
+          <InfoCircledIcon />
+        </Callout.Icon>
+        <Callout.Text>
+          No sources found. Add a new source by clicking the button above.
+        </Callout.Text>
+      </Callout.Root>
+    );
+  }
+
   return (
     <Flex gap="4" direction="column" align="center">
-      {sources.length ? (
-        sources.map((source) => (
-          <SourceRow
-            key={source.id}
-            source={source}
-            isSelected={selectedId === source.id}
-            onClick={() => handleGridClick(source.id)}
-            updateStatus={updateStatus(source.id)}
-          />
-        ))
-      ) : (
-        <Callout.Root variant="outline">
-          <Callout.Icon>
-            <InfoCircledIcon />
-          </Callout.Icon>
-          <Callout.Text>
-            No sources found. Add a new source by clicking the button above.
-          </Callout.Text>
-        </Callout.Root>
+      {sources.map((source) => (
+        <SourceRow
+          key={source.id}
+          source={source}
+          onClick={() => setSelectedSource(source)}
+        />
+      ))}
+      {selectedSource && (
+        <SourceViewer
+          source={selectedSource}
+          onOpenChange={() => setSelectedSource(null)}
+        />
       )}
     </Flex>
   );

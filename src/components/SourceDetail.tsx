@@ -1,7 +1,9 @@
 import { ArrowTopRightIcon, TrashIcon } from "@radix-ui/react-icons";
 import {
+  Badge,
   Button,
   Card,
+  Dialog,
   Flex,
   IconButton,
   Separator,
@@ -9,8 +11,19 @@ import {
   Tooltip,
 } from "@radix-ui/themes";
 import { Duration } from "luxon";
+import { useState } from "react";
+import { pdfjs } from "react-pdf";
 import { Source } from "../interfaces";
 import Clock, { UseClockResult } from "./Clock";
+
+// Set the worker source for pdfjs
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.js",
+  import.meta.url
+).toString();
+
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
 
 function humanizeDuration(duration: Duration): [number, string] {
   let num = 0;
@@ -41,6 +54,7 @@ export default function SourceDetail({
   onRemove,
   clock,
 }: SourceDetailProps) {
+  const [showFile, setShowFile] = useState(false);
   if (!source) {
     return (
       <Card style={{ height: "100%" }}>
@@ -118,22 +132,46 @@ export default function SourceDetail({
           </Flex>
         </Flex>
         <Flex justify="between" mt="auto">
-          <Button asChild>
-            <a
-              href={source.file ? URL.createObjectURL(source.file) : source.url}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => clock.setIsRunning(true)}
-            >
-              Open Link
-              <ArrowTopRightIcon />
-            </a>
+          <Button
+            onClick={() => {
+              const hasFile = source.file !== null;
+
+              if (!hasFile) {
+                window.open(source.url);
+              } else {
+                setShowFile(true);
+              }
+
+              clock.setIsRunning(true);
+            }}
+          >
+            Open Link
+            <ArrowTopRightIcon />
           </Button>
+
           <IconButton color="red" variant="solid" onClick={onRemove}>
             <TrashIcon />
           </IconButton>
         </Flex>
       </Flex>
+      <Dialog.Root open={showFile} onOpenChange={() => setShowFile(false)}>
+        <Dialog.Content>
+          <Dialog.Title weight="light">
+            <Text as="div" weight="bold" className="line-overflow">
+              {source.title}
+            </Text>
+            <Flex gap="3" align="center" py="2">
+              <Badge variant="soft">
+                Timer: {clock.time.toFormat("hh:mm:ss")}
+              </Badge>
+              <Badge variant="soft" color="indigo">
+                Time Read: {timeReadNum} {timeReadUnit}
+              </Badge>
+            </Flex>
+            <Separator style={{ width: "100%" }} />
+          </Dialog.Title>
+        </Dialog.Content>
+      </Dialog.Root>
     </Card>
   );
 }

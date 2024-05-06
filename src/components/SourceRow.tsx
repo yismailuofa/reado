@@ -1,69 +1,36 @@
-import {
-  GlobeIcon,
-  Link2Icon,
-  ReaderIcon,
-  VideoIcon,
-} from "@radix-ui/react-icons";
+import { ArrowTopRightIcon, TrashIcon } from "@radix-ui/react-icons";
 import {
   Avatar,
   Badge,
   Box,
+  Button,
   Card,
   Flex,
+  IconButton,
+  Popover,
   Select,
   Text,
   Tooltip,
 } from "@radix-ui/themes";
-import { Source, SourceType, Status } from "../interfaces";
+import {
+  removeSource,
+  updateSourceStatus,
+} from "../features/sources/sourcesSlice";
+import { Source, Status } from "../interfaces";
+import { useAppDispatch } from "../store";
+import { sourceTypeToIcon, statusToBadgeColor } from "../util";
 
 interface SourceRowProps {
   source: Source;
   onClick: () => void;
-  isSelected: boolean;
-  updateStatus: (status: Status) => void;
 }
 
-function sourceTypeToIcon(type: SourceType) {
-  const iconSize = "20px";
+export default function SourceRow({ source, onClick }: SourceRowProps) {
+  const dispatch = useAppDispatch();
 
-  switch (type) {
-    case SourceType.Book:
-      return <ReaderIcon height={iconSize} width={iconSize} />;
-    case SourceType.Article:
-      return <GlobeIcon height={iconSize} width={iconSize} />;
-    case SourceType.Video:
-      return <VideoIcon height={iconSize} width={iconSize} />;
-    default:
-      return <Link2Icon height={iconSize} width={iconSize} />;
-  }
-}
-
-export function statusToBadgeColor(status: Status) {
-  switch (status) {
-    case Status.NotStarted:
-      return "gray";
-    case Status.InProgress:
-      return "blue";
-    case Status.Completed:
-      return "green";
-    default:
-      return "gray";
-  }
-}
-
-export default function SourceRow({
-  source,
-  onClick,
-  isSelected,
-  updateStatus,
-}: SourceRowProps) {
   return (
     <Box width="500px">
-      <Card
-        size="1"
-        onClick={onClick}
-        className={"source-row" + (isSelected ? " card-selected" : "")}
-      >
+      <Card size="1" className="source-row">
         <Flex gap="3" align="center">
           <Avatar
             size="3"
@@ -87,7 +54,11 @@ export default function SourceRow({
             <Badge variant="solid">{source.type}</Badge>
             <Select.Root
               value={source.status}
-              onValueChange={updateStatus}
+              onValueChange={(value) =>
+                dispatch(
+                  updateSourceStatus({ id: source.id, status: value as Status })
+                )
+              }
               size="2"
             >
               <Select.Trigger variant="ghost" color="gray">
@@ -104,6 +75,38 @@ export default function SourceRow({
               </Select.Content>
             </Select.Root>
           </Flex>
+        </Flex>
+        <Flex justify="between" pt="3" align="center">
+          <Button size="1" onClick={onClick}>
+            Open
+            <ArrowTopRightIcon />
+          </Button>
+          <Popover.Root>
+            <Popover.Trigger>
+              <IconButton color="red" variant="solid" size="1">
+                <TrashIcon />
+              </IconButton>
+            </Popover.Trigger>
+            <Popover.Content>
+              <Flex gap="2" direction="column">
+                <Text size="2">
+                  Are you sure you want to delete this source?
+                </Text>
+                <Popover.Close>
+                  <Button
+                    color="red"
+                    size="1"
+                    ml="auto"
+                    onClick={() => {
+                      dispatch(removeSource(source.id));
+                    }}
+                  >
+                    Confirm
+                  </Button>
+                </Popover.Close>
+              </Flex>
+            </Popover.Content>
+          </Popover.Root>
         </Flex>
       </Card>
     </Box>

@@ -12,7 +12,9 @@ import {
 import { DateTime, Duration } from "luxon";
 import { useCallback, useState } from "react";
 import { DBSource } from "../db";
+import { addSource } from "../features/sources/sourcesSlice";
 import { SourceType, Status } from "../interfaces";
+import { useAppDispatch } from "../store";
 
 interface TextRowProps extends SourceProps {
   label: string;
@@ -51,7 +53,7 @@ function UrlOrFileRow({ source, setSource }: SourceProps) {
       <TextField.Root
         placeholder="URL"
         style={{ width: hasFile ? "69%" : "50%" }}
-        value={hasFile ? source.file!.name : source.url}
+        value={hasFile ? source.file!.f.name : source.url}
         onChange={(e) => setSource({ ...source, url: e.target.value })}
         disabled={hasFile}
       />
@@ -61,7 +63,14 @@ function UrlOrFileRow({ source, setSource }: SourceProps) {
         accept=".pdf"
         onChange={(e) => {
           if (e.target.files && e.target.files.length > 0) {
-            setSource({ ...source, file: e.target.files[0], url: "" });
+            setSource({
+              ...source,
+              file: {
+                f: e.target.files[0],
+                page: 1,
+              },
+              url: "",
+            });
           }
         }}
       />
@@ -109,19 +118,17 @@ function TypeSelectRow({ source, setSource }: SourceProps) {
   );
 }
 
-export default function CreateButton({
-  addSource,
-}: {
-  addSource: (source: DBSource) => void;
-}) {
+export default function CreateButton() {
+  const dispatch = useAppDispatch();
+
   const defaultSource: DBSource = {
     title: "",
     authors: "",
     url: "",
     timeRead: Duration.fromObject({}).toObject(),
     type: SourceType.Article,
-    createdAt: DateTime.now().toJSDate(),
-    updatedAt: DateTime.now().toJSDate(),
+    createdAt: DateTime.now().toObject(),
+    updatedAt: DateTime.now().toObject(),
     status: Status.NotStarted,
     file: null,
   };
@@ -133,7 +140,7 @@ export default function CreateButton({
       return;
     }
 
-    addSource(source);
+    dispatch(addSource(source));
     setSource(defaultSource);
     setOpen(false);
   }, [source]);
