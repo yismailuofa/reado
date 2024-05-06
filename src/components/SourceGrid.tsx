@@ -1,9 +1,10 @@
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { Callout, Flex } from "@radix-ui/themes";
+import { Worker } from "@react-pdf-viewer/core";
 import { useState } from "react";
 import {
-  dbSourceToSource,
   sourcesSelector,
+  storeSourceToSource,
 } from "../features/sources/sourcesSlice";
 import { Source } from "../interfaces";
 import { useAppSelector } from "../store";
@@ -11,7 +12,7 @@ import SourceRow from "./SourceRow";
 import SourceViewer from "./SourceViewer";
 
 export default function SourceGrid() {
-  const sources = useAppSelector(sourcesSelector).map(dbSourceToSource);
+  const sources = useAppSelector(sourcesSelector).map(storeSourceToSource);
   const [selectedSource, setSelectedSource] = useState<Source | null>(null);
 
   if (!sources.length) {
@@ -36,12 +37,14 @@ export default function SourceGrid() {
           onClick={() => setSelectedSource(source)}
         />
       ))}
-      {selectedSource && (
-        <SourceViewer
-          source={selectedSource}
-          onOpenChange={() => setSelectedSource(null)}
-        />
-      )}
+      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
+        {selectedSource && (
+          <SourceViewer
+            source={selectedSource}
+            onOpenChange={() => setSelectedSource(null)}
+          />
+        )}
+      </Worker>
     </Flex>
   );
 }

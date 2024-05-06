@@ -8,8 +8,8 @@ import {
 } from "@radix-ui/themes";
 import { useMemo } from "react";
 import {
-  dbSourceToSource,
   sourcesSelector,
+  storeSourceToSource,
 } from "../features/sources/sourcesSlice";
 import { useAppSelector } from "../store";
 import { getStats } from "../util";
@@ -17,7 +17,7 @@ import CreateButton from "./CreateButton";
 import SourceGrid from "./SourceGrid";
 
 export default function App() {
-  const sources = useAppSelector(sourcesSelector).map(dbSourceToSource);
+  const sources = useAppSelector(sourcesSelector).map(storeSourceToSource);
   const stats = useMemo(() => getStats(sources), [sources]);
 
   return (
@@ -26,7 +26,7 @@ export default function App() {
         <CreateButton />
         <Flex gap="3" ml="auto">
           <Badge color="orange" size="2">
-            Total Time Read: {stats.totalTimeRead.toHuman()}
+            Total Time Read: {stats.totalTimeRead.toHuman() || "0s"}
           </Badge>
           <Badge color="cyan" size="2">
             Sources: {sources.length}

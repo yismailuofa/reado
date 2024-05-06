@@ -76,14 +76,14 @@ export default function SourceRow({ source, onClick }: SourceRowProps) {
             </Select.Root>
           </Flex>
         </Flex>
-        <Flex justify="between" pt="3" align="center">
+        <Flex justify="between" pt="3" align="end">
           <Button size="1" onClick={onClick}>
             Open
             <ArrowTopRightIcon />
           </Button>
           <Popover.Root>
             <Popover.Trigger>
-              <IconButton color="red" variant="solid" size="1">
+              <IconButton color="red" variant="ghost" size="1">
                 <TrashIcon />
               </IconButton>
             </Popover.Trigger>

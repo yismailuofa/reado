@@ -1,14 +1,5 @@
-// db.ts
 import Dexie, { Table } from "dexie";
-import { Source } from "./interfaces";
-
-export interface DBSource
-  extends Omit<Source, "id" | "createdAt" | "updatedAt" | "timeRead"> {
-  id?: number;
-  createdAt: object;
-  updatedAt: object;
-  timeRead: object;
-}
+import { DBSource } from "./interfaces";
 
 export class SourceDexie extends Dexie {
   sources!: Table<DBSource>;
