@@ -81,7 +81,15 @@ export default function SourceViewer({
   }
 
   useEffect(() => {
-    window.history.pushState({}, "", window.location.href);
+    const listener = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener("beforeunload", listener);
+
+    return () => {
+      window.removeEventListener("beforeunload", listener);
+    };
   }, []);
 
   return (
