@@ -54,7 +54,7 @@ const sourcesSlice = createSlice({
           })
           .rescale()
           .toObject();
-        source.updatedAt = DateTime.now();
+        source.updatedAt = DateTime.now().toObject();
       }
     });
     builder.addCase(updateSourcePage.fulfilled, (state, action) => {
@@ -71,6 +71,9 @@ const sourcesSlice = createSlice({
 export default sourcesSlice.reducer;
 
 export const sourcesSelector = (state: RootState) => state.sources.sources;
+export const sourceSelector = (id: number) => (state: RootState) => {
+  return state.sources.sources.find((source) => source.id === id);
+};
 
 export const loadSources = createAsyncThunk("sources/loadSources", async () => {
   const sources = (await db.sources.toArray()).map(dbSourceToStoreSource);

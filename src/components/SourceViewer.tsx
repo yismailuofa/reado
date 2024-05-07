@@ -1,27 +1,31 @@
 import { Badge, Box, Dialog, Flex, TextField } from "@radix-ui/themes";
 import { Viewer } from "@react-pdf-viewer/core";
-import { Source } from "../interfaces";
 import Clock from "./Clock";
 
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
-import { updateSourcePage } from "../features/sources/sourcesSlice";
-import { useAppDispatch } from "../store";
+import {
+  sourceSelector,
+  storeSourceToSource,
+  updateSourcePage,
+} from "../features/sources/sourcesSlice";
+import { useAppDispatch, useAppSelector } from "../store";
 
 interface SourceViewerProps {
-  source: Source;
+  sourceId: number;
   onOpenChange: (open: boolean) => void;
 }
 
 export default function SourceViewer({
-  source,
+  sourceId,
   onOpenChange,
 }: SourceViewerProps) {
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     sidebarTabs: () => [],
   });
+  const source = storeSourceToSource(useAppSelector(sourceSelector(sourceId))!);
   const dispatch = useAppDispatch();
 
   let content;
@@ -82,9 +86,9 @@ export default function SourceViewer({
             disabled
           />
           <Flex gap="2" align="center" justify="between">
-            <Clock />
+            <Clock id={source.id} />
             <Badge variant="soft" color="indigo" size="2">
-              Time Read: 1 hour
+              Total Time Read: {source.timeRead.toHuman() || "0s"}
             </Badge>
           </Flex>
           <Flex className="frameBox" direction="column" align="center">

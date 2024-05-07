@@ -6,14 +6,16 @@ import {
   sourcesSelector,
   storeSourceToSource,
 } from "../features/sources/sourcesSlice";
-import { Source } from "../interfaces";
 import { useAppSelector } from "../store";
+import { sourceComparator } from "../util";
 import SourceRow from "./SourceRow";
 import SourceViewer from "./SourceViewer";
 
 export default function SourceGrid() {
-  const sources = useAppSelector(sourcesSelector).map(storeSourceToSource);
-  const [selectedSource, setSelectedSource] = useState<Source | null>(null);
+  const sources = useAppSelector(sourcesSelector)
+    .map(storeSourceToSource)
+    .sort(sourceComparator);
+  const [selectedSourceId, setSelectedSourceId] = useState<number | null>(null);
 
   if (!sources.length) {
     return (
@@ -34,14 +36,14 @@ export default function SourceGrid() {
         <SourceRow
           key={source.id}
           source={source}
-          onClick={() => setSelectedSource(source)}
+          onClick={() => setSelectedSourceId(source.id)}
         />
       ))}
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-        {selectedSource && (
+        {selectedSourceId !== null && (
           <SourceViewer
-            source={selectedSource}
-            onOpenChange={() => setSelectedSource(null)}
+            sourceId={selectedSourceId}
+            onOpenChange={() => setSelectedSourceId(null)}
           />
         )}
       </Worker>
