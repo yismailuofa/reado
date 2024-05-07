@@ -5,6 +5,7 @@ import Clock from "./Clock";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
+import { ClockIcon } from "@radix-ui/react-icons";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import {
   sourceSelector,
@@ -88,6 +89,7 @@ export default function SourceViewer({
           <Flex gap="2" align="center" justify="between">
             <Clock id={source.id} />
             <Badge variant="soft" color="indigo" size="2">
+              <ClockIcon />
               Total Time Read: {source.timeRead.toHuman() || "0s"}
             </Badge>
           </Flex>

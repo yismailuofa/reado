@@ -1,4 +1,4 @@
-import { PauseIcon, PlayIcon } from "@radix-ui/react-icons";
+import { PauseIcon, PlayIcon, StopwatchIcon } from "@radix-ui/react-icons";
 import { Badge, Flex, IconButton } from "@radix-ui/themes";
 import { Duration } from "luxon";
 import { useEffect, useState } from "react";
@@ -24,7 +24,8 @@ export default function Clock({ id }: { id: number }) {
   return (
     <Flex align="center" gap="3" direction="column">
       <Flex gap="2">
-        <Badge variant="soft" size="2" style={{ width: "170px" }}>
+        <Badge variant="soft" size="2" style={{ width: "190px" }}>
+          <StopwatchIcon />
           Current Session: {time.toFormat("hh:mm:ss")}
         </Badge>
         <IconButton
