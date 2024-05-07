@@ -1,5 +1,5 @@
 import { InfoCircledIcon } from "@radix-ui/react-icons";
-import { Callout, Flex } from "@radix-ui/themes";
+import { Callout, Flex, ScrollArea } from "@radix-ui/themes";
 import { Worker } from "@react-pdf-viewer/core";
 import { useState } from "react";
 import {
@@ -31,22 +31,24 @@ export default function SourceGrid() {
   }
 
   return (
-    <Flex gap="4" direction="column" align="center">
-      {sources.map((source) => (
-        <SourceRow
-          key={source.id}
-          source={source}
-          onClick={() => setSelectedSourceId(source.id)}
-        />
-      ))}
-      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-        {selectedSourceId !== null && (
-          <SourceViewer
-            sourceId={selectedSourceId}
-            onOpenChange={() => setSelectedSourceId(null)}
+    <ScrollArea type="auto" scrollbars="vertical">
+      <Flex gap="4" direction="column" align="center" pr="4">
+        {sources.map((source) => (
+          <SourceRow
+            key={source.id}
+            source={source}
+            onClick={() => setSelectedSourceId(source.id)}
           />
-        )}
-      </Worker>
-    </Flex>
+        ))}
+        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
+          {selectedSourceId !== null && (
+            <SourceViewer
+              sourceId={selectedSourceId}
+              onOpenChange={() => setSelectedSourceId(null)}
+            />
+          )}
+        </Worker>
+      </Flex>
+    </ScrollArea>
   );
 }
