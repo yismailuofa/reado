@@ -1,12 +1,25 @@
-import { Badge, Box, Dialog, Flex, TextField } from "@radix-ui/themes";
+import {
+  Badge,
+  Box,
+  Dialog,
+  Flex,
+  IconButton,
+  TextField,
+} from "@radix-ui/themes";
 import { Viewer } from "@react-pdf-viewer/core";
 import Clock from "./Clock";
 
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
-import { ClockIcon } from "@radix-ui/react-icons";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ClockIcon,
+  Cross2Icon,
+} from "@radix-ui/react-icons";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import { useEffect, useRef } from "react";
 import {
   sourceSelector,
   storeSourceToSource,
@@ -28,6 +41,19 @@ export default function SourceViewer({
   });
   const source = storeSourceToSource(useAppSelector(sourceSelector(sourceId))!);
   const dispatch = useAppDispatch();
+  const frameRef = useRef<HTMLIFrameElement>(null);
+
+  const webFrame = (src: string) => (
+    <iframe
+      src={src}
+      className="rt-reset"
+      style={{
+        height: "100%",
+        width: "100%",
+      }}
+      ref={frameRef}
+    />
+  );
 
   let content;
   if (source.resource.type === "FILE") {
@@ -37,18 +63,8 @@ export default function SourceViewer({
         fileUrl={f}
         plugins={[defaultLayoutPluginInstance]}
         initialPage={page}
-        renderError={(error) => {
-          console.error("Fallback to iframe", error);
-          return (
-            <iframe
-              src={f}
-              className="rt-reset"
-              style={{
-                height: "100%",
-                width: "100%",
-              }}
-            />
-          );
+        renderError={() => {
+          return webFrame(f);
         }}
         onPageChange={(e) => {
           dispatch(
@@ -61,37 +77,55 @@ export default function SourceViewer({
       />
     );
   } else {
-    content = (
-      <iframe
-        src={source.resource.url}
-        className="rt-reset"
-        style={{
-          height: "100%",
-          width: "100%",
-        }}
-      />
-    );
+    content = webFrame(source.resource.url);
   }
+
+  useEffect(() => {
+    window.history.pushState({}, "", window.location.href);
+  }, []);
 
   return (
     <Dialog.Root onOpenChange={onOpenChange} open>
       <Dialog.Content size="1" maxWidth="80%">
         <Flex gap="2" direction="column">
-          <TextField.Root
-            type="url"
-            value={
-              source.resource.type === "URL"
-                ? source.resource.url
-                : source.resource.f
-            }
-            disabled
-          />
+          <Flex gap="2" align="center">
+            <Box flexGrow="1">
+              <TextField.Root
+                type="url"
+                value={
+                  source.resource.type === "URL"
+                    ? source.resource.url
+                    : source.resource.f
+                }
+                disabled
+              />
+            </Box>
+            <Box>
+              <IconButton color="gray" onClick={() => onOpenChange(false)}>
+                <Cross2Icon />
+              </IconButton>
+            </Box>
+          </Flex>
           <Flex gap="2" align="center" justify="between">
-            <Clock id={source.id} />
-            <Badge variant="soft" color="indigo" size="2">
-              <ClockIcon />
-              Total Time Read: {source.timeRead.toHuman() || "0s"}
-            </Badge>
+            <Flex width="30%" align="start">
+              <Clock id={source.id} />
+            </Flex>
+            {frameRef.current && (
+              <Flex gap="2" minWidth="50px" align="center">
+                <IconButton size="1" onClick={() => history.back()}>
+                  <ArrowLeftIcon />
+                </IconButton>
+                <IconButton size="1" onClick={() => history.forward()}>
+                  <ArrowRightIcon />
+                </IconButton>
+              </Flex>
+            )}
+            <Flex width="30%" justify="end">
+              <Badge variant="soft" color="indigo" size="2">
+                <ClockIcon />
+                Total Time Read: {source.timeRead.toHuman() || "0s"}
+              </Badge>
+            </Flex>
           </Flex>
           <Flex className="frameBox" direction="column" align="center">
             <Box style={{ height: "80vh", width: "100%" }}>{content}</Box>
