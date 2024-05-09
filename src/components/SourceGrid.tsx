@@ -28,12 +28,10 @@ export default function SourceGrid() {
   const [search, setSearch] = useState("");
   const [selectedSourceId, setSelectedSourceId] = useState<number | null>(null);
   const sources = matchSorter(
-    useAppSelector(sourcesSelector)
-      .map(storeSourceToSource)
-      .sort(sourceComparator),
+    useAppSelector(sourcesSelector).map(storeSourceToSource),
     search,
     { keys: ["title", "authors"] }
-  );
+  ).sort(sourceComparator);
   const dispatch = useAppDispatch();
 
   return (
