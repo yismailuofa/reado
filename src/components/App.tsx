@@ -48,7 +48,7 @@ export default function App() {
           <Heading as="h2" size="3" weight="bold" align="center">
             Knowledge Sources
           </Heading>
-          <Box pt="4" style={{ height: "510px" }}>
+          <Box pt="2" style={{ height: "510px" }}>
             <SourceGrid />
           </Box>
         </Box>
