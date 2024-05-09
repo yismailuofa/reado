@@ -4,7 +4,7 @@ import {
   ReaderIcon,
   VideoIcon,
 } from "@radix-ui/react-icons";
-import { Duration } from "luxon";
+import { Duration, ToHumanDurationOptions } from "luxon";
 import { Source, SourceType, Status } from "./interfaces";
 
 export function getStats(sources: Source[]) {
@@ -81,19 +81,13 @@ export function sourceComparator(a: Source, b: Source): number {
   return statusOrder[a.status] - statusOrder[b.status];
 }
 
-export function humanizeDuration(duration: Duration): string {
-  let num = 0;
-  const config = { unitDisplay: "short" } as const;
+export function humanizeDuration(
+  duration: Duration,
+  config: ToHumanDurationOptions = { unitDisplay: "short" }
+) {
+  const units = ["hours", "minutes", "seconds"] as const;
+  const unit = units.find((unit) => duration.as(unit) >= 1) || "seconds";
+  const num = Math.floor(duration.as(unit));
 
-  if (duration.as("hours") >= 1) {
-    num = Math.floor(duration.as("hours"));
-    return Duration.fromObject({ hours: num }).toHuman(config);
-  } else if (duration.as("minutes") >= 1) {
-    num = Math.floor(duration.as("minutes"));
-    return Duration.fromObject({ minutes: num }).toHuman(config);
-  } else {
-    num = Math.floor(duration.as("seconds"));
-
-    return Duration.fromObject({ seconds: num }).toHuman(config);
-  }
+  return Duration.fromObject({ [unit]: num }).toHuman(config);
 }

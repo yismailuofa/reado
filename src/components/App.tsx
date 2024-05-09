@@ -5,6 +5,7 @@ import {
   Flex,
   Heading,
   Separator,
+  Tooltip,
 } from "@radix-ui/themes";
 import { useMemo } from "react";
 import {
@@ -12,7 +13,7 @@ import {
   storeSourceToSource,
 } from "../features/sources/sourcesSlice";
 import { useAppSelector } from "../store";
-import { getStats } from "../util";
+import { getStats, humanizeDuration } from "../util";
 import CreateButton from "./CreateButton";
 import SourceGrid from "./SourceGrid";
 
@@ -25,9 +26,11 @@ export default function App() {
       <Flex align="end" pb="4" mx="2">
         <CreateButton />
         <Flex gap="3" ml="auto">
-          <Badge color="orange" size="2">
-            Total Time Read: {stats.totalTimeRead.toHuman() || "0s"}
-          </Badge>
+          <Tooltip content={stats.totalTimeRead.toHuman()}>
+            <Badge color="orange" size="2">
+              Total Time Read: {humanizeDuration(stats.totalTimeRead, {})}
+            </Badge>
+          </Tooltip>
           <Badge color="cyan" size="2">
             Sources: {sources.length}
           </Badge>

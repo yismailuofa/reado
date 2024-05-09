@@ -5,6 +5,7 @@ import {
   Flex,
   IconButton,
   TextField,
+  Tooltip,
 } from "@radix-ui/themes";
 import { Viewer } from "@react-pdf-viewer/core";
 import Clock from "./Clock";
@@ -26,6 +27,7 @@ import {
   updateSourcePage,
 } from "../features/sources/sourcesSlice";
 import { useAppDispatch, useAppSelector } from "../store";
+import { humanizeDuration } from "../util";
 
 interface SourceViewerProps {
   sourceId: number;
@@ -129,10 +131,12 @@ export default function SourceViewer({
               </Flex>
             )}
             <Flex width="30%" justify="end">
-              <Badge variant="soft" color="indigo" size="2">
-                <ClockIcon />
-                Total Time Read: {source.timeRead.toHuman() || "0s"}
-              </Badge>
+              <Tooltip content={source.timeRead.toHuman()}>
+                <Badge variant="soft" color="indigo" size="2">
+                  <ClockIcon />
+                  Total Time Read: {humanizeDuration(source.timeRead, {})}
+                </Badge>
+              </Tooltip>
             </Flex>
           </Flex>
           <Flex className="frameBox" direction="column" align="center">
