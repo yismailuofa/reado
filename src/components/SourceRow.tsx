@@ -1,22 +1,28 @@
-import { ArrowTopRightIcon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  ArrowTopRightIcon,
+  DotsHorizontalIcon,
+  Share2Icon,
+  TrashIcon,
+} from "@radix-ui/react-icons";
 import {
   Avatar,
   Badge,
   Box,
   Button,
   Card,
+  DropdownMenu,
   Flex,
   IconButton,
-  Popover,
   Select,
   Text,
   Tooltip,
 } from "@radix-ui/themes";
+import { useState } from "react";
 import {
   removeSource,
   updateSourceStatus,
 } from "../features/sources/sourcesSlice";
-import { Source, Status } from "../interfaces";
+import { ResourceType, Source, Status } from "../interfaces";
 import { useAppDispatch } from "../store";
 import {
   humanizeDuration,
@@ -31,6 +37,8 @@ interface SourceRowProps {
 
 export default function SourceRow({ source, onClick }: SourceRowProps) {
   const dispatch = useAppDispatch();
+  const [deleteConfirming, setDeleteConfirming] = useState(false);
+  const [copyingUrl, setCopyingUrl] = useState(false);
 
   return (
     <Box width="500px">
@@ -88,32 +96,57 @@ export default function SourceRow({ source, onClick }: SourceRowProps) {
             Open
             <ArrowTopRightIcon />
           </Button>
-          <Popover.Root>
-            <Popover.Trigger>
-              <IconButton color="red" variant="ghost" size="1">
-                <TrashIcon />
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <IconButton variant="ghost" size="1">
+                <DotsHorizontalIcon />
               </IconButton>
-            </Popover.Trigger>
-            <Popover.Content>
-              <Flex gap="2" direction="column">
-                <Text size="2">
-                  Are you sure you want to delete this source?
-                </Text>
-                <Popover.Close>
-                  <Button
-                    color="red"
-                    size="1"
-                    ml="auto"
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              <DropdownMenu.Item
+                onClick={() => {
+                  if (deleteConfirming) {
+                    dispatch(removeSource(source.id));
+                    return;
+                  }
+                  setDeleteConfirming(true);
+
+                  setTimeout(() => {
+                    setDeleteConfirming(false);
+                  }, 2000);
+                }}
+                color="red"
+                onSelect={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                {deleteConfirming ? "Confirm" : "Delete"}
+                <TrashIcon />
+              </DropdownMenu.Item>
+              {source.resource.type === ResourceType.URL && (
+                <>
+                  <DropdownMenu.Separator />
+                  <DropdownMenu.Item
+                    onSelect={(e) => {
+                      e.preventDefault();
+                    }}
                     onClick={() => {
-                      dispatch(removeSource(source.id));
+                      if (source.resource.type === ResourceType.URL) {
+                        navigator.clipboard.writeText(source.resource.url);
+                        setCopyingUrl(true);
+
+                        setTimeout(() => {
+                          setCopyingUrl(false);
+                        }, 2000);
+                      }
                     }}
                   >
-                    Confirm
-                  </Button>
-                </Popover.Close>
-              </Flex>
-            </Popover.Content>
-          </Popover.Root>
+                    {copyingUrl ? "Copied!" : "Copy URL"} <Share2Icon />
+                  </DropdownMenu.Item>
+                </>
+              )}
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
         </Flex>
       </Card>
     </Box>

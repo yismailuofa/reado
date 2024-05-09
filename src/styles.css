@@ -39,3 +39,7 @@ body {
   padding-bottom: 0;
   padding-top: 0;
 }
+
+.rt-DropdownMenuItem {
+  cursor: pointer;
+}
