@@ -80,3 +80,20 @@ export function sourceComparator(a: Source, b: Source): number {
 
   return statusOrder[a.status] - statusOrder[b.status];
 }
+
+export function humanizeDuration(duration: Duration): string {
+  let num = 0;
+  const config = { unitDisplay: "short" } as const;
+
+  if (duration.as("hours") >= 1) {
+    num = Math.floor(duration.as("hours"));
+    return Duration.fromObject({ hours: num }).toHuman(config);
+  } else if (duration.as("minutes") >= 1) {
+    num = Math.floor(duration.as("minutes"));
+    return Duration.fromObject({ minutes: num }).toHuman(config);
+  } else {
+    num = Math.floor(duration.as("seconds"));
+
+    return Duration.fromObject({ seconds: num }).toHuman(config);
+  }
+}

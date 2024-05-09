@@ -18,7 +18,11 @@ import {
 } from "../features/sources/sourcesSlice";
 import { Source, Status } from "../interfaces";
 import { useAppDispatch } from "../store";
-import { sourceTypeToIcon, statusToBadgeColor } from "../util";
+import {
+  humanizeDuration,
+  sourceTypeToIcon,
+  statusToBadgeColor,
+} from "../util";
 
 interface SourceRowProps {
   source: Source;
@@ -63,7 +67,10 @@ export default function SourceRow({ source, onClick }: SourceRowProps) {
             >
               <Select.Trigger variant="ghost" color="gray">
                 <Badge color={statusToBadgeColor(source.status)}>
-                  {source.status}
+                  {source.status +
+                    (source.status === Status.InProgress
+                      ? ` (${humanizeDuration(source.timeRead)})`
+                      : "")}
                 </Badge>
               </Select.Trigger>
               <Select.Content>
