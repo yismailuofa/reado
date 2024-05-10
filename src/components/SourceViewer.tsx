@@ -14,13 +14,14 @@ import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 import {
+  ActivityLogIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
   ClockIcon,
   Cross2Icon,
 } from "@radix-ui/react-icons";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   sourceSelector,
   storeSourceToSource,
@@ -39,7 +40,13 @@ export default function SourceViewer({
   onOpenChange,
 }: SourceViewerProps) {
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
-    sidebarTabs: () => [],
+    sidebarTabs: (defaultTabs) => [
+      {
+        ...defaultTabs[1],
+        icon: <ActivityLogIcon />,
+        title: "Table of Contents",
+      },
+    ],
   });
   const source = storeSourceToSource(useAppSelector(sourceSelector(sourceId))!);
   const dispatch = useAppDispatch();
@@ -57,30 +64,31 @@ export default function SourceViewer({
     />
   );
 
-  let content;
-  if (source.resource.type === "FILE") {
-    const { f, page } = source.resource;
-    content = (
-      <Viewer
-        fileUrl={f}
-        plugins={[defaultLayoutPluginInstance]}
-        initialPage={page}
-        renderError={() => {
-          return webFrame(f);
-        }}
-        onPageChange={(e) => {
-          dispatch(
-            updateSourcePage({
-              id: source.id,
-              page: e.currentPage,
-            })
-          );
-        }}
-      />
-    );
-  } else {
-    content = webFrame(source.resource.url);
-  }
+  const content = useMemo(() => {
+    if (source.resource.type === "FILE") {
+      const { f, page } = source.resource;
+      return (
+        <Viewer
+          fileUrl={f}
+          plugins={[defaultLayoutPluginInstance]}
+          initialPage={page}
+          renderError={() => {
+            return webFrame(f);
+          }}
+          onPageChange={(e) => {
+            dispatch(
+              updateSourcePage({
+                id: source.id,
+                page: e.currentPage,
+              })
+            );
+          }}
+        />
+      );
+    } else {
+      return webFrame(source.resource.url);
+    }
+  }, [source.resource, source.id]);
 
   useEffect(() => {
     const listener = (e: BeforeUnloadEvent) => {
